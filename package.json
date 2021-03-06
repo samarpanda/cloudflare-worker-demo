@@ -1,0 +1,16 @@
+{
+  "name": "cloudflare-worker-demo",
+  "version": "1.0.0",
+  "main": "src/index.js",
+  "scripts": {
+    "whoami": "wrangler whoami",
+    "build": "wrangler build",
+    "deploy": "wrangler publish"
+  },
+  "devDependencies": {
+    "@cloudflare/wrangler": "^1.14.1"
+  },
+  "repository": "git@github.com:samarpanda/cloudflare-worker-demo.git",
+  "author": "Samar <er.samarpanda@gmail.com>",
+  "license": "MIT"
+}
