@@ -1,60 +1,62 @@
-const site = 'www.example.com'
+const site = 'www.example.com';
 
-addEventListener('fetch', event => {
- event.respondWith(handleRequest(event.request))
+addEventListener('fetch', (event) => {
+  event.respondWith(handleRequest(event.request));
 });
 
 async function handleRequest(request) {
+  const url = new URL(request.url);
 
- const url = new URL(request.url);
+  /**
+   * Disallow crawlers
+   */
+  if (url.pathname === '/robots.txt') {
+    return new Response('User-agent: *\nDisallow: /', { status: 200 });
+  }
 
- // Disallow crawlers
+  /**
+   * When overrideHost is used in a script, WPT sets x-host to original host i.e. site we want to proxy
+   */
+  const host = request.headers.get('x-host');
 
- if(url.pathname === "/robots.txt") {
-   return new Response('User-agent: *\nDisallow: /', {status: 200});
- }
+  /**
+   * Error if x-host header missing
+   */
+  if (!host) {
+    return new Response('x-host header missing', { status: 403 });
+  }
 
- // When overrideHost is used in a script, WPT sets x-host to original host i.e. site we want to proxy
+  url.hostname = host;
+  const bypassTransform = request.headers.get('x-bypass-transform');
+  const acceptHeader = request.headers.get('accept');
 
- const host = request.headers.get('x-host');
+  /**
+   * If it's the original document, and we don't want to bypass the rewrite of HTML
+   * TODO will also select sub-documents e.g. iframes, from the same site :-(
+   */
+  if (
+    host === site &&
+    acceptHeader &&
+    acceptHeader.indexOf('text/html') >= 0 &&
+    (!bypassTransform || (bypassTransform && bypassTransform.indexOf('true') === -1))
+  ) {
+    const response = await fetch(url.toString(), request);
 
-   // Error if x-host header missing
+    return new HTMLRewriter().on('h1', new exampleElementHandler()).transform(response);
+  }
 
- if(!host) {
-   return new Response('x-host header missing', {status: 403});
- }
-
- url.hostname = host;
-
- const bypassTransform = request.headers.get('x-bypass-transform');
-
- const acceptHeader = request.headers.get('accept');
-
- // If it's the original document, and we don't want to bypass the rewrite of HTML
- // TODO will also select sub-documents e.g. iframes, from the same site :-(
-
- if(host === site &&
-   (acceptHeader && acceptHeader.indexOf('text/html') >= 0) &&
-   (!bypassTransform || (bypassTransform && bypassTransform.indexOf('true') === -1))) {
-
-   const response = await fetch(url.toString(), request)
-
-   return new HTMLRewriter()
-     .on('selector', new exampleElementHandler())
-     .transform(response)
-   }
-
- // Otherwise just proxy the request
-
- return fetch(url.toString(), request)
+  /**
+   * Otherwise just proxy the request
+   */
+  return fetch(url.toString(), request);
 }
 
-/*
- *
+/**
+ * Transformation of title
  */
-
 class exampleElementHandler {
- element(element) {
-   // Do something
- }
+  element(element) {
+    console.log(`Incoming element: ${element.tagName}`);
+    element.setInnerContent('Example Domain - Samar', { html: false });
+  }
 }
