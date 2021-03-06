@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "main": "src/index.js",
   "scripts": {
+    "wrangler": "wrangler",
+    "dev": "wrangler dev",
     "whoami": "wrangler whoami",
     "build": "wrangler build",
     "deploy": "wrangler publish"
