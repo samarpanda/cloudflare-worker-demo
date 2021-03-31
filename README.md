@@ -20,7 +20,7 @@ yarn deploy
 Verify using curl commands
 
 ```cmd
-curl -H "x-host: www.example.com" -H "accept: text/html" https://cloudflare-worker-demo.samar-2020.workers.dev | less
+curl -H "x-host: www.example.com" -H "accept: text/html" https://cloudflare.sp-edge.workers.dev | less
 ```
 
 ## Docs
