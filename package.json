@@ -10,7 +10,7 @@
     "deploy": "wrangler publish"
   },
   "devDependencies": {
-    "@cloudflare/wrangler": "^1.14.1"
+    "@cloudflare/wrangler": "^1.15.0"
   },
   "repository": "git@github.com:samarpanda/cloudflare-worker-demo.git",
   "author": "Samar <er.samarpanda@gmail.com>",
