@@ -1,4 +1,4 @@
-const site = 'www.example.com';
+const site = 'www.winc.com.au';
 
 addEventListener('fetch', (event) => {
   event.respondWith(handleRequest(event.request));
@@ -40,9 +40,15 @@ async function handleRequest(request) {
     acceptHeader.indexOf('text/html') >= 0 &&
     (!bypassTransform || (bypassTransform && bypassTransform.indexOf('true') === -1))
   ) {
-    const response = await fetch(url.toString(), request);
-
-    return new HTMLRewriter().on('h1', new exampleElementHandler()).transform(response);
+    let response = await fetch(url.toString(), request, {
+      cf: { cacheTtl: 1800 }
+    });
+    response = new Response(response.body, response);
+    response.headers.set('Cache-Control', 'max-age=1500');
+    response.headers.delete('pragma');
+    response.headers.delete('expires');
+    return response;
+    // return new HTMLRewriter().on('h1', new exampleElementHandler()).transform(response);
   }
 
   /**
@@ -57,6 +63,6 @@ async function handleRequest(request) {
 class exampleElementHandler {
   element(element) {
     console.log(`Incoming element: ${element.tagName}`);
-    element.setInnerContent('Example Domain - Samar', { html: false });
+    element.setInnerContent('Samar', { html: false });
   }
 }
